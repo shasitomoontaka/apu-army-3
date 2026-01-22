@@ -1,0 +1,83 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Sidebar from '../components/Sidebar.astro'; 
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+        <BaseHead title="Help Helper" description={SITE_DESCRIPTION} />
+
+	</head>
+	<body>
+		<Header />
+		<div class="content-wrapper">
+			<main>
+				<h1>Help Helper</h1>
+				<p>You can support running this website by</p>
+				<ul>
+				  <li>Sharing with your frens</li>
+				  <li>
+					<a href="https://buymeacoffee.com/shasito" target="_blank" rel="noopener noreferrer">
+					  Buy me a choccy milk
+					</a>
+				  </li>
+				  <li>
+					Donating shitcoins
+					<ul>
+						<li>
+						  <a href="https://etherscan.io/address/0x0817d53BFff5A2bf5B70b94962C06ab7A4f431ed" target="_blank" rel="noopener noreferrer">
+							Ethereum & Layer 2
+						  </a>
+						</li>
+						<li>
+						  <a href="https://solscan.io/account/9oYm9MhuqUmYnCxeWoFwUaPTGfukqhpN3u6gLagbKCYs" target="_blank" rel="noopener noreferrer">
+							Solana
+						  </a>
+						</li>
+					  </ul>
+					  
+					<li>
+						Buying NFTs
+						<ul>
+							<li>
+							  <a href="https://the-apu-shrimp-collection.nfts2.me/" target="_blank" rel="noopener noreferrer">
+								The Apu Shrimp Collection
+							  </a>
+							</li>
+				
+						  </ul>
+						  
+					  </li>
+
+					  <li>
+						Sign up using our refs
+						<ul>
+							<li>
+							  <a href="https://app.carrotfunding.io/join/APUARMY" target="_blank" rel="noopener noreferrer">
+								Carrotfunding.io</a> 🥕
+							</li>
+				
+						  </ul>
+						  
+					  </li>
+				</ul>
+				
+				
+
+				
+				  
+
+                <img class="img-square" src="/apu-love.png" alt="Apu Apustaja Loves You"/>
+
+			</main>
+			<Sidebar />
+		</div>
+		<Footer />
+
+
+	</body>
+</html>

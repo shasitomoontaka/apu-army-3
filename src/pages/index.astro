@@ -1,0 +1,32 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Sidebar from '../components/Sidebar.astro'; 
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+
+	</head>
+	<body>
+		<Header />
+		<div class="content-wrapper">
+			<main>
+				<h1>Henlo Fren!</h1>
+				<p>Welcome to the <a href="https://x.com/search?q=%24APU&src=typed_query" target="_blank" rel="noopener noreferrer">Apu Army</a></p>
+				<p>We are a group of [redacted] people who love memes and especially <a href="https://knowyourmeme.com/memes/apu-apustaja" target="_blank" rel="noopener noreferrer">
+					Apu Apustaja</a></p>
+
+				<img src="/apu.png" alt="Apu Apustaja"/>
+
+			</main>
+			<Sidebar />
+		</div>
+		<Footer />
+
+	</body>
+</html>

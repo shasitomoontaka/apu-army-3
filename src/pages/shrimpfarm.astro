@@ -1,0 +1,303 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION } from '../consts';
+import Sidebar from '../components/Sidebar.astro';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title="Apu's Shrimp Farm" description={SITE_DESCRIPTION} />
+    <style>
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 700px;
+  margin: 0 auto 12px auto; /* center + space below header */
+  padding: 8px 16px;
+  background: #00bfff;
+  color: white;
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 16px;
+}
+
+.game-header .score {
+  font-weight: bold;
+}
+
+.game-header .buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.game-header .buttons button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: white;
+  color: #00bfff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.game-header .buttons button:hover {
+  background: #f0f8ff;
+}
+
+.game-wrapper {
+  max-width: 700px;
+  margin: 0 auto 2rem auto; /* center and space below canvas */
+  position: relative;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #87ceeb;
+  border-radius: 8px;
+}
+
+.center-wrapper {
+  text-align: center;
+  max-width: 700px;
+  margin: 16px auto;
+  font-family: sans-serif;
+}
+
+    </style>
+  </head>
+  <body>
+    <Header />
+    <div class="content-wrapper">
+		<main>
+			<h1 class="center-wrapper">Apu's Shrimp Farm</h1>
+			<p class="center-wrapper">Make them shrimps your frens.</p>
+      <div class="game-header">
+        <div class="score">
+          Score: <span id="score">0</span> | Best: <span id="best">0</span>
+        </div>
+        <div class="buttons">
+          <button id="pauseBtn">▶︎‖</button>
+          <button id="restartBtn">Re(s)tard</button>
+        </div>
+      </div>
+			<div class="game-wrapper">
+
+			  <canvas id="game"></canvas>
+			</div>
+		  
+		
+			  <h2 style=" margin-top: 2rem;">How to play</h2>
+			
+			<p>Whales and shrimps live in a great symbiosis. One could say they are frens.</p>
+			<p>That's why indoor shrimp farming became so cozy.</p>
+			<p>Press space bar or click to start the game.</p>
+			<p>Move the whale using WASD or arrow keys</p>
+			<p>On mobile swipe to move the whale</p>
+		  </main>
+		  
+      <Sidebar />
+    </div>
+    <Footer />
+
+    <script>
+    (function(){
+      const canvas=document.getElementById('game');
+      const ctx=canvas.getContext('2d');
+
+      const gridSize=32;
+      const cols=20;
+      const rows=15;
+      canvas.width=cols*gridSize;
+      canvas.height=rows*gridSize;
+
+      const whaleImg=new Image(); whaleImg.src='/shrimpfarm/whale.png';
+      const shrimpImg=new Image(); shrimpImg.src='/shrimpfarm/shrimp.png';
+      const bgImg=new Image(); bgImg.src='/shrimpfarm/background.jpg';
+      const popupImg=new Image(); popupImg.src='/shrimpfarm/popup.png';
+
+      let imagesLoaded=0;
+      [whaleImg, shrimpImg, bgImg, popupImg].forEach(img=>{
+        img.onload=()=>{ imagesLoaded++; if(imagesLoaded===4) init(); }
+      });
+
+      let running=false, paused=false, lastTick=0, stepMs=200, stepMin=50, speedupEvery=5;
+      let score=0, best=Number(localStorage.getItem('whaleShrimpBest')||0);
+      const scoreEl=document.getElementById('score');
+      const bestEl=document.getElementById('best');
+      bestEl.textContent=best;
+
+      const whale={x:3,y:5,dir:'right',nextDir:'right',flip:false};
+      let tail=[];
+      let food=null;
+      let showPopupCounter=0;
+      let showMessage = 'Start'; 
+
+      function init(){
+  score = 0;
+  tail = [];
+  whale.x = 3; whale.y = 5;
+  whale.dir = 'right';
+  whale.nextDir = 'right';
+  whale.flip = false;
+  stepMs = 200;
+  lastTick = 0;
+  running = false;
+  paused = false;
+  showPopupCounter = 0;
+  placeFood();
+
+  // Show Start text immediately
+  showMessage = 'Henlo, click to start';
+  draw(); // draw canvas with background + "Start"
+}
+
+function startGame(){
+  if(!running){
+    running = true;
+    paused = false;
+    lastTick = 0;
+    // Hide the Start message
+    showMessage = '';
+    requestAnimationFrame(loop);
+  }
+}
+
+
+      function placeFood(){
+        while(true){
+          const x=Math.floor(Math.random()*cols);
+          const y=Math.floor(Math.random()*rows);
+          const overlap=tail.some(s=>s.x===x&&s.y===y)||(whale.x===x&&whale.y===y);
+          if(!overlap){ food={x,y}; break; }
+        }
+      }
+
+      function startGame(){ if(!running){ running=true; paused=false; lastTick=0; requestAnimationFrame(loop); showMessage=''; } }
+      function togglePause(){ if(!running) return; paused=!paused; if(!paused) requestAnimationFrame(loop); }
+
+      function loop(ts){
+        if(!running || paused) return;
+        if(!lastTick) lastTick=ts;
+        if(ts - lastTick >= stepMs){ lastTick=ts; step(); }
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      function step(){
+        const opposite={up:'down',down:'up',left:'right',right:'left'};
+        if(whale.nextDir!==opposite[whale.dir]) whale.dir=whale.nextDir;
+
+        tail.unshift({x:whale.x,y:whale.y});
+
+        switch(whale.dir){
+          case 'up': whale.y-=1; whale.flip=false; break;
+          case 'down': whale.y+=1; whale.flip=false; break;
+          case 'left': whale.x-=1; whale.flip=true; break;
+          case 'right': whale.x+=1; whale.flip=false; break;
+        }
+
+        if(whale.x<0||whale.y<0||whale.x>=cols||whale.y>=rows) return gameOver();
+        if(tail.some(s=>s.x===whale.x && s.y===whale.y)) return gameOver();
+
+        if(whale.x===food.x && whale.y===food.y){
+          score++; updateScore(); placeFood();
+          if(score%speedupEvery===0) stepMs=Math.max(stepMin, stepMs-10);
+          if(score%10===0) showPopupCounter=30; 
+        } else tail.pop();
+
+        if(showPopupCounter>0) showPopupCounter--;
+      }
+
+      function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
+
+        if(food) drawSprite(shrimpImg,food.x,food.y,gridSize);
+        tail.forEach(s=>drawSprite(shrimpImg,s.x,s.y,gridSize));
+        drawSprite(whaleImg,whale.x,whale.y,gridSize,whale.flip);
+
+        if(showPopupCounter>0){
+          ctx.drawImage(popupImg, canvas.width-64-8, canvas.height-64-8, 64, 64);
+        }
+
+        if(showMessage){
+          ctx.fillStyle='white';
+          ctx.font='48px sans-serif';
+          ctx.textAlign='center';
+          ctx.textBaseline='middle';
+          ctx.fillText(showMessage, canvas.width/2, canvas.height/2);
+        }
+      }
+
+      function drawSprite(img,x,y,size,flip=false){
+        const px=x*size, py=y*size;
+        ctx.save();
+        if(flip){ ctx.translate(px+size/2,py+size/2); ctx.scale(-1,1); ctx.drawImage(img,-size/2,-size/2,size,size); }
+        else ctx.drawImage(img,px,py,size,size);
+        ctx.restore();
+      }
+
+      function updateScore(){
+        scoreEl.textContent=score;
+        if(score>best){ best=score; bestEl.textContent=best; localStorage.setItem('whaleShrimpBest',best);}
+      }
+
+      function gameOver(){
+        running=false;
+        paused=false;
+        showMessage = 'REKT';
+        setTimeout(()=>{ showMessage=''; init(); },1000);
+      }
+
+      document.addEventListener('keydown',e=>{
+        if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+        const k=e.key.toLowerCase();
+        if(k===' '){ if(!running) startGame(); else togglePause(); return; }
+        if(['arrowup','w'].includes(k)) whale.nextDir='up';
+        if(['arrowdown','s'].includes(k)) whale.nextDir='down';
+        if(['arrowleft','a'].includes(k)) whale.nextDir='left';
+        if(['arrowright','d'].includes(k)) whale.nextDir='right';
+      });
+
+      document.getElementById('pauseBtn').addEventListener('click',()=>{ if(!running) startGame(); else togglePause(); });
+      document.getElementById('restartBtn').addEventListener('click',()=>init());
+      canvas.addEventListener('click',()=>{ if(!running) startGame(); });
+
+      let touchStartX = 0, touchStartY = 0;
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault(); // stop scroll
+  const t = e.touches[0];
+  touchStartX = t.clientX;
+  touchStartY = t.clientY;
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  e.preventDefault(); // stop scroll
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchStartX;
+  const dy = t.clientY - touchStartY;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    whale.nextDir = dx > 0 ? 'right' : 'left';
+  } else {
+    whale.nextDir = dy > 0 ? 'down' : 'up';
+  }
+}, { passive: false });
+
+// Start game when tapping anywhere on the canvas (mobile-friendly)
+canvas.addEventListener('touchstart', e => {
+  if (!running) {
+    e.preventDefault(); // prevent accidental scroll
+    startGame();
+  }
+}, { passive: false });
+
+    })();
+    </script>

@@ -1,0 +1,404 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Sidebar from '../components/Sidebar.astro'; 
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+        <BaseHead title="Crashout Appointment" description={SITE_DESCRIPTION} />
+
+        <style>
+
+
+            .form-container {
+                background: #fff;
+                border-radius: 10px;
+                padding: 30px;
+                margin-bottom: 30px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                max-width: 700px;
+                margin: 0 auto 30px auto;
+            }
+    
+            .form-container h1 {
+                color: #558A36;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+    
+            .form-container label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: bold;
+                color: #333;
+            }
+    
+            .form-container input, .form-container textarea {
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 15px;
+                border: 2px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+                box-sizing: border-box;
+            }
+    
+            .form-container input:focus, .form-container textarea:focus {
+                outline: none;
+                border-color: #558A36;
+            }
+    
+            .form-container textarea {
+                height: 100px;
+                resize: vertical;
+            }
+    
+            .form-container button {
+                background: #558A36;
+                color: white;
+                padding: 12px 30px;
+                border: none;
+                border-radius: 5px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background 0.3s;
+                width: 100%;
+            }
+    
+            .form-container button:hover {
+                background: #4a7530;
+            }
+    
+            .certificate-container {
+                text-align: center;
+                margin-top: 30px;
+                max-width: 700px;
+                margin: 30px auto;
+            }
+    
+            #certificate-canvas {
+                border: 2px solid #000;
+                margin-bottom: 20px;
+                background: white;
+                max-width: 100%;
+            }
+    
+            #download-btn {
+                background: #558A36;
+                color: white;
+                padding: 12px 30px;
+                border: none;
+                border-radius: 5px;
+                font-size: 16px;
+                cursor: pointer;
+                display: none;
+            }
+    
+            #download-btn:hover {
+                background: #4a7530;
+            }
+        </style>
+	</head>
+	<body>
+		<Header />
+		<div class="content-wrapper">
+			<main>
+				<h1>Crashout Appointment</h1>
+				<p>Please no unscheduled crashouts online. Thank you.</p>
+
+                <div class="form-container">
+
+                <form id="certificate-form">
+                    <label for="image-upload">Upload Image:</label>
+                    <input type="file" id="image-upload" accept="image/*">
+                    
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" placeholder="Enter Name" required>
+                    
+                    <label for="handle">X Handle:</label>
+                    <input type="text" id="handle" placeholder="@yourhandle" required>
+                    
+                    <label for="reason">Reason for Crashout:</label>
+                    <textarea id="reason" placeholder="Describe your crashout situation..." required></textarea>
+                    
+                    <label for="crashout-date">Scheduled Crashout Date:</label>
+                    <input type="date" id="crashout-date" required>
+                    
+                    <button type="submit">Generate Crashout Certificate</button>
+                </form>
+            
+                </div>
+
+                <div class="certificate-container">
+                    <canvas id="certificate-canvas" width="700" height="500"></canvas>
+                    <br>
+                    <button id="download-btn">Download Certificate</button>
+                </div>
+
+			</main>
+			<Sidebar />
+		</div>
+		<Footer />
+
+        <script>
+            // Function to wrap text within a specified width
+            function wrapText(context, text, x, y, maxWidth, lineHeight) {
+                const words = text.split(' ');
+                let line = '';
+                let currentY = y;
+    
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n] + ' ';
+                    const metrics = context.measureText(testLine);
+                    const testWidth = metrics.width;
+                    
+                    if (testWidth > maxWidth && n > 0) {
+                        context.fillText(line, x, currentY);
+                        line = words[n] + ' ';
+                        currentY += lineHeight;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                context.fillText(line, x, currentY);
+                return currentY + lineHeight;
+            }
+    
+            document.getElementById('certificate-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+    
+                // Get form values
+                const name = document.getElementById('name').value;
+                const handle = document.getElementById('handle').value;
+                const reason = document.getElementById('reason').value;
+                const crashoutDate = document.getElementById('crashout-date').value;
+                const imageUpload = document.getElementById('image-upload').files[0];
+    
+                // Get canvas context
+                const canvas = document.getElementById('certificate-canvas');
+                const ctx = canvas.getContext('2d');
+    
+                // Function to draw the complete certificate
+                function drawCompleteCertificate() {
+                    // Clear the canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+                    // Document background
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+                    // Official header section
+                    ctx.fillStyle = '#000';
+                    ctx.font = 'bold 24px Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('OFFICIAL APPOINTMENT CERTIFICATE', canvas.width / 2, 40);
+                    
+                    ctx.font = '18px Arial, sans-serif';
+                    ctx.fillText('APU.COM MEDICAL DEPARTMENT', canvas.width / 2, 65);
+    
+                    // Document title
+                    ctx.font = 'bold 20px Arial, sans-serif';
+                    ctx.fillStyle = '#333';
+                    ctx.fillText('CRASHOUT APPOINTMENT AUTHORIZATION', canvas.width / 2, 120);
+                    
+                    // Document number and date
+                    const docNumber = Math.floor(Math.random() * 900000) + 100000;
+                    ctx.font = '12px Arial, sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.fillStyle = '#666';
+                    ctx.fillText(`Document No: CA-${docNumber}`, 50, 150);
+                    
+                    const date = new Date();
+                    const dateString = date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`Date Issued: ${dateString}`, canvas.width - 50, 150);
+    
+                    // FIXED: Watermark positioned more to the right
+                    ctx.save();
+                    ctx.translate(canvas.width - 120, canvas.height / 2 + 50);
+                    ctx.rotate(-Math.PI / 6);
+                    ctx.font = 'bold 35px Arial, sans-serif';
+                    ctx.fillStyle = 'rgba(200, 200, 200, 0.25)';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('APU ARMY', 0, 0);
+                    ctx.restore();
+    
+                    // Personal information section
+                    const infoStartY = 180;
+                    const leftMargin = 200;
+                    
+                    ctx.textAlign = 'left';
+                    ctx.font = 'bold 14px Arial, sans-serif';
+                    ctx.fillStyle = '#000';
+                    ctx.fillText('APPOINTEE INFORMATION:', leftMargin, infoStartY);
+                    
+                    ctx.font = '12px Arial, sans-serif';
+                    ctx.fillText(`Full Name: ${name}`, leftMargin, infoStartY + 25);
+                    
+                    // Add @ to handle if not present
+                    const displayHandle = handle.startsWith('@') ? handle : `@${handle}`;
+                    ctx.fillText(`Contact: ${displayHandle}`, leftMargin, infoStartY + 45);
+                    
+                    // FIXED: Highlighted crashout date with yellow background
+                    const crashoutDateFormatted = new Date(crashoutDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    const dateText = `Scheduled Crashout Date: ${crashoutDateFormatted}`;
+                    ctx.font = '12px Arial, sans-serif';
+                    const dateMetrics = ctx.measureText(dateText);
+                    
+                    // Yellow highlight background
+                    ctx.fillStyle = '#FFFF00';
+                    ctx.globalAlpha = 0.4;
+                    ctx.fillRect(leftMargin - 5, infoStartY + 50, dateMetrics.width + 10, 20);
+                    ctx.globalAlpha = 1.0;
+                    
+                    // Date text
+                    ctx.fillStyle = '#000';
+                    ctx.fillText(dateText, leftMargin, infoStartY + 65);
+    
+                    // Official authorization section
+                    ctx.font = 'bold 14px Arial, sans-serif';
+                    ctx.fillText('OFFICIAL AUTHORIZATION:', leftMargin, infoStartY + 105);
+                    
+                    ctx.font = '12px Arial, sans-serif';
+                    ctx.fillText('This document hereby grants the above-named individual', leftMargin, infoStartY + 125);
+                    ctx.fillText('official authorization to engage in crashout activities', leftMargin, infoStartY + 140);
+                    ctx.fillText('as deemed necessary and appropriate.', leftMargin, infoStartY + 155);
+    
+                    // Incident details section
+                    ctx.font = 'bold 12px Arial, sans-serif';
+                    ctx.fillText('CRASHOUT JUSTIFICATION:', 50, 360);
+                    
+                    // Text box for reason
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(50, 370, canvas.width - 100, 70);
+                    
+                    ctx.font = '11px Arial, sans-serif';
+                    ctx.fillStyle = '#333';
+                    
+                    // Wrap reason text
+                    wrapText(ctx, reason, 60, 385, canvas.width - 120, 12);
+    
+                    // Signature section
+                    ctx.font = '12px Arial, sans-serif';
+                    ctx.fillStyle = '#000';
+                    
+                    // Signature line
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(450, 460);
+                    ctx.lineTo(650, 460);
+                    ctx.stroke();
+    
+                    ctx.font = '10px Arial, sans-serif';
+                    ctx.fillStyle = '#666';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('High Council Representative', 550, 475);
+                    
+                    // Footer
+                    ctx.font = '10px Arial, sans-serif';
+                    ctx.fillStyle = '#333';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('This document is valid and binding under [redacted] jurisdiction.', 50, 460);
+                    ctx.fillText('apuarmy.com/crashout', 50, 475);
+    
+                    // Document border
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+    
+                    // Show download button
+                    document.getElementById('download-btn').style.display = 'inline-block';
+                }
+    
+                // Handle photo upload if provided
+                if (imageUpload) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Draw certificate first
+                        drawCompleteCertificate();
+                        
+                        // Then add photo on top
+                        ctx.save();
+                        const photoX = 50;
+                        const photoY = 180;
+                        const photoWidth = 120;
+                        const photoHeight = 120;
+                        
+                        // Photo frame background
+                        ctx.fillStyle = '#f0f0f0';
+                        ctx.fillRect(photoX - 5, photoY - 5, photoWidth + 10, photoHeight + 10);
+                        ctx.strokeStyle = '#333';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(photoX - 5, photoY - 5, photoWidth + 10, photoHeight + 10);
+                        
+                        // Clip to photo area
+                        ctx.beginPath();
+                        ctx.rect(photoX, photoY, photoWidth, photoHeight);
+                        ctx.clip();
+                        
+                        // FIXED: Scale to show full image
+                        const scaleX = photoWidth / img.width;
+                        const scaleY = photoHeight / img.height;
+                        const scale = Math.max(scaleX, scaleY); // Fill the frame completely
+                        
+                        const scaledWidth = img.width * scale;
+                        const scaledHeight = img.height * scale;
+                        
+                        // Center the image
+                        const offsetX = (photoWidth - scaledWidth) / 2;
+                        const offsetY = (photoHeight - scaledHeight) / 2;
+                        
+                        // Background fill if image doesn't fill frame
+                        ctx.fillStyle = '#f8f8f8';
+                        ctx.fillRect(photoX, photoY, photoWidth, photoHeight);
+                        
+                        ctx.drawImage(img, photoX + offsetX, photoY + offsetY, scaledWidth, scaledHeight);
+                        ctx.restore();
+                        
+                        // Photo label
+                        ctx.font = '10px Arial, sans-serif';
+                        ctx.fillStyle = '#666';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('OFFICIAL PHOTO', photoX + photoWidth/2, photoY + photoHeight + 15);
+                    };
+                    img.src = URL.createObjectURL(imageUpload);
+                } else {
+                    // Draw certificate without photo
+                    drawCompleteCertificate();
+                }
+            });
+    
+            // Download functionality
+            document.getElementById('download-btn').addEventListener('click', function() {
+                const canvas = document.getElementById('certificate-canvas');
+                const dataUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = 'crashout-appointment.png';
+                link.click();
+            });
+    
+            // Handle file upload feedback
+            document.getElementById('image-upload').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    console.log('Photo selected: ' + e.target.files[0].name);
+                }
+            });
+        </script>
+	</body>
+</html>

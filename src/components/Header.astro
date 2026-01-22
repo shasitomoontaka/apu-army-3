@@ -1,0 +1,156 @@
+---
+import { SITE_TITLE } from '../consts';
+import HeaderLink from './HeaderLink.astro';
+---
+
+<header>
+	<nav>
+	  <h2><a href="/"><img src="/logo.png" alt="Apu Army Logo" class="logo" />{SITE_TITLE}</a></h2>
+  
+	  <!-- Hamburger toggle for small screens -->
+	  <div class="hamburger-toggle">&#9776;</div>
+  
+	  <!-- Container for both nav links and button -->
+	  <div class="menu-container">
+		<div class="internal-links">
+		  <HeaderLink href="/">Home</HeaderLink>
+		  <HeaderLink href="/about">About</HeaderLink>
+		  <HeaderLink href="/apucoin">Apu Coin</HeaderLink>
+		  <HeaderLink href="/music">Music</HeaderLink>
+
+		  <HeaderLink href="/blog">Blog</HeaderLink>
+		  
+		</div>
+  
+		<div class="standard-button">
+		  <a 
+			href="https://x.com/search?q=%24APU&src=typed_query" 
+			target="_blank"
+			aria-label="Find new friends online"
+		  >
+			Apu loves you
+		  </a>
+		</div>
+	  </div>
+	</nav>
+  </header>
+  
+  <style>
+	header {
+	  margin: 0;
+	  padding: 0 1em;
+	  background: white;
+	  box-shadow: 0 2px 8px rgba(var(--black), 5%);
+	}
+  
+	h2 { margin: 0; font-size: 1em; }
+	h2 a, h2 a.active { text-decoration: none; }
+
+	.logo {
+		height: 32px;        /* small height */
+		width: auto;         /* keep aspect ratio */
+		margin-right: 0.5em; /* spacing between logo and title */
+		vertical-align: middle;
+}
+
+  
+	nav {
+	  display: flex;
+	  align-items: center;
+	  justify-content: space-between;
+	  position: relative;
+	}
+  
+	.menu-container {
+	  display: flex;
+	  align-items: center;
+	  gap: 5em;
+	}
+  
+	.internal-links {
+	  display: flex;
+	  gap: 1em;
+	}
+  
+/* Base nav links style */
+nav a {
+  padding: 1em 0.5em;
+  color: var(--black);
+  border-bottom: 4px solid transparent;
+  text-decoration: none;
+}
+
+/* Only apply active border to links that are NOT buttons */
+nav a.active:not(.standard-button) {
+  border-bottom-color: var(--accent);
+}
+
+/* Only apply hover styles to links that are NOT buttons */
+nav a:not(.standard-button):hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+
+
+/* Optional: hover effect for button without changing text color */
+nav .standard-button a:hover {
+  color: white;
+  border-bottom: none;
+}
+
+
+
+	.hamburger-toggle {
+	  display: none;
+	  font-size: 2rem;
+	  cursor: pointer;
+	}
+
+	
+  
+	@media (max-width: 720px) {
+	  .hamburger-toggle { display: block; }
+	  
+	  .menu-container {
+		display: none;
+		flex-direction: column;
+		gap: 0.5em;
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: white;
+		box-shadow: 0 2px 8px rgba(var(--black), 0.05);
+		padding: 0.5em 1em;
+		align-items: center;
+	  }
+  
+	  .menu-container.open { display: flex; }
+  
+	  .internal-links {
+		flex-direction: column;
+		gap: 0.5em;
+		align-items: center;
+	  }
+
+	  .header-button {
+		width: 90%;
+		margin: 0.5em auto;
+		display: block;
+		text-align: center;
+      }
+	}
+  </style>
+  
+  <script type="module">
+	document.addEventListener('DOMContentLoaded', () => {
+	  const toggleButton = document.querySelector('.hamburger-toggle');
+	  const menuContainer = document.querySelector('.menu-container');
+  
+	  toggleButton?.addEventListener('click', () => {
+		menuContainer.classList.toggle('open');
+	  });
+	});
+  </script>
+  

@@ -1,0 +1,193 @@
+
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    background-image: url('/apufight/background.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+#player, .enemy, .projectile {
+    position: absolute;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#player {
+    width: 69px;
+    height: 69px;
+    bottom: 10%;
+    left: 10%;
+    background-image: url('/apufight/player.png');
+}
+
+.enemy {
+    width: 69px;
+    height: 69px;
+    bottom: 10%; /* Same bottom value to align the enemy with the player */
+    right: 10%;
+}
+
+/* Floor styles */
+#floor {
+    position: absolute;
+    bottom: 0; /* Place it at the bottom of the game container */
+    left: 0;
+    width: 100%; /* Full width of the game container */
+    height: 50px; /* Adjust height as needed for the floor */
+    background-color: black; /* #654321 Brown color for the floor */
+    border-top: 5px solid grey ; /* #3d2b1f Darker border on top of the floor */
+	display: flex; /* Enable flexbox */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */    font-weight: bold;
+    color: white;
+    font-size: 15px;
+    font-family: var(--main-font);
+}
+
+.projectile {
+    width: 35px;
+    height: 35px;
+}
+
+#hud {
+    position: absolute;
+    top: 30px;
+    left: 10px;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+}
+
+#hud > div {
+    display: flex; /* Align items in a row */
+    justify-content: flex-start; /* Align items to the left */
+    margin-bottom: 5px; /* Add some spacing between lines */
+}
+
+/* Start button styles */
+#start-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--apu-green);
+    color: white;
+    padding: 15px 30px;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: none; /* Hidden by default */
+    border: solid 2px;
+}
+
+
+
+/* Pre-game image styles */
+#pre-game-image {
+    position: absolute;
+    top: 0; /* Aligns to the top */
+    left: 0; /* Aligns to the left */
+    display: none; /* Hidden by default */
+    width: 100%; /* Full width of the container */
+    height: 100%; /* Full height of the container */
+    overflow: hidden; /* Hide overflow, if any */
+}
+
+#pre-game-image img {
+    position: absolute; /* Allows positioning within the container */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust to center based on width and height */
+    min-width: 100%; /* Ensure image covers full width */
+    min-height: 100%; /* Ensure image covers full height */
+    object-fit: cover; /* Scale the image to cover the container */
+}
+
+
+
+
+
+
+
+#mobile-controls {
+    display: flex;
+    justify-content: space-between; /* spread buttons evenly */
+    left: 0;
+    width: 100%;     /* full width of the container */
+    background-color: black;
+    padding: 10px;
+    box-sizing: border-box; /* include padding in width */
+  }
+  
+  #mobile-controls button {
+    flex: 1;                 /* all buttons same width */
+    margin: 0 5px;           /* spacing between buttons */
+    font-size: 24px;
+    padding: 10px 0;
+    color: white;
+    background-color: var(--main-color);
+    border: none;
+    border-radius: 5px;
+  }
+  
+
+
+
+#loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#player-health-bar, #enemy-health-bar {
+    position: absolute;
+    width: 200px; /* Adjust the width of the health bar */
+    height: 10px;
+    background-color: #ccc; /* Background color for the empty part */
+    border: 1px solid #333; /* Border around the health bar */
+}
+
+#player-health-bar {
+    top: 5px; /* Place it on top of the player */
+    left: 10px; /* Position it slightly to the left */
+}
+
+#enemy-health-bar {
+    top: 5px; /* Place it on top of the enemy */
+    right: 10px; /* Position it slightly to the right */
+}
+
+#player-health-bar-inner, #enemy-health-bar-inner {
+    height: 100%;
+    background-color: green; /* Green color for health */
+}
+
+#enemy-health-bar-inner {
+    transition: width 0.3s; /* Smooth transition when health decreases */
+}
+
+#player-health-bar-inner {
+    transition: width 0.3s; /* Smooth transition when health decreases */
+}
+
+
+@media (max-width: 768px) {
+    #mobile-controls {
+        display: flex;
+        max-width: 100%;
+    }
+    
+    #player-health-bar, #enemy-health-bar {
+    position: absolute;
+    max-width: 40%; /* Adjust the width of the health bar */
+}

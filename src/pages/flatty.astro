@@ -1,0 +1,219 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { SITE_DESCRIPTION } from '../consts';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <BaseHead title="Flatty Carrots" description={SITE_DESCRIPTION} />
+  <style>
+
+
+    canvas {
+      display: block;
+      margin: 20px auto;
+      border: 4px solid #333;
+      border-radius: 12px;
+      background: #70c5ce;
+      width: 800px;
+      height: 600px;
+    }
+
+    .fc-stats {
+      color: #fff;
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 2px #000;
+      display: none;
+
+    }
+
+    .fc-stats span {
+      margin-right: 15px;
+    }
+  </style>
+</head>
+<body>
+  <Header />
+  <div class="content-wrapper">
+    <main>
+      <h1 class="center-wrapper" style="color: orange">Flatty Carrot</h1>
+      <p class="center-wrapper">Click or hit space bar to ride the carrot.</p>
+
+      <canvas id="canvas" width="800" height="600"></canvas>
+      <div class="fc-stats">
+        <span id="currentScore">Candles: 0</span>
+        <span id="bestScore">Candles Max: 0</span>
+        <span id="coinCount">Coins: 0</span>
+        <span id="pointsCount">Score: 0</span>
+        <span id="highScore">High Score: 0</span>
+      </div>
+
+
+    </main>
+    <Sidebar />
+  </div>
+  <Footer />
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const carrotImg = new Image();
+    carrotImg.src = "/flatty/fc-apu.png"; // make sure this path is correct relative to /public
+
+    const coinImg = new Image();
+    coinImg.src = "/flatty/fc-coin.png"; // adjust path if needed
+
+
+
+    let gamePlaying = false;
+    const gravity = 0.6, speed = 6, birdSize = 100, jump = -8;
+    const cTenth = canvas.width / 10;
+
+    let bestScore = 0, highScore = 0;
+    let flight, flyHeight, currentScore = 0, pointsCount = 0;
+    let pipes = [], coins = [], coinCount = 0;
+
+    const pipeWidth = 133, pipeGapMin = 200, pipeGapMax = 400;
+    const coinRadius = 10;
+    const maxPipeHeight = canvas.height * 0.69;
+
+    const pipeLoc = () => Math.random() * maxPipeHeight;
+    const pipeSpacing = () => pipeGapMin + Math.random() * (pipeGapMax - pipeGapMin);
+
+    const setup = () => {
+      currentScore = 0;
+      pointsCount = 0;
+      coinCount = 0;
+      flight = jump;
+      flyHeight = (canvas.height / 2) - (birdSize / 2);
+
+      // create initial pipes
+      pipes = Array(3).fill().map((_, i) => [canvas.width + i*(pipeWidth + pipeGapMin), pipeLoc()]);
+
+      // spawn coins in pipe gaps
+      coins = pipes.map(pipe => {
+        const minY = pipe[1] + 20;
+        const maxY = pipe[1] + pipeGapMax - 20;
+        return [pipe[0] + pipeWidth/2, minY + Math.random()*(maxY - minY)];
+      });
+    }
+
+    const render = () => {
+      // background
+      const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+      grad.addColorStop(0,"#70c5ce");
+      grad.addColorStop(1,"#d0f0f7");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+
+      // pipes
+      pipes.forEach((pipe, i) => {
+        if(gamePlaying) pipe[0] -= speed;
+
+        // top pipe = red
+        ctx.fillStyle = "red";
+        ctx.fillRect(pipe[0],0,pipeWidth,pipe[1]);
+
+        // bottom pipe = green
+        ctx.fillStyle = "green";
+        ctx.fillRect(pipe[0],pipe[1]+pipeGapMax,pipeWidth,canvas.height);
+
+        // collision
+        if(cTenth + birdSize > pipe[0] && cTenth < pipe[0]+pipeWidth &&
+           (flyHeight < pipe[1] || flyHeight+birdSize > pipe[1]+pipeGapMax)){
+          gamePlaying = false;
+          setup();
+        }
+
+        // new pipe
+        if(pipe[0] <= -pipeWidth){
+          currentScore++;
+          bestScore = Math.max(bestScore, currentScore);
+
+          const lastPipeX = pipes[pipes.length-1][0];
+          const newX = lastPipeX + pipeWidth + pipeSpacing();
+          const newPipeY = pipeLoc();
+          pipes = [...pipes.slice(1), [newX, newPipeY]];
+
+          // spawn coin in new pipe gap
+          const minY = newPipeY + 20;
+          const maxY = newPipeY + pipeGapMax - 20;
+          coins.push([newX + pipeWidth/2, minY + Math.random()*(maxY - minY)]);
+        }
+      });
+
+      // coins
+      coins = coins.filter((coin) => {
+        if(gamePlaying) coin[0] -= speed;
+
+        const coinSize = 33; // adjust to scale the image
+        ctx.drawImage(coinImg, coin[0] - coinSize/2, coin[1] - coinSize/2, coinSize, coinSize);
+
+
+        // collect coin
+        const collected = (cTenth + birdSize > coin[0]-coinRadius &&
+                           cTenth < coin[0]+coinRadius &&
+                           flyHeight + birdSize > coin[1]-coinRadius &&
+                           flyHeight < coin[1]+coinRadius);
+        if(collected) coinCount++;
+
+        return !collected; // keep only if not collected
+      });
+
+      // bird
+      if(gamePlaying){
+        flight += gravity;
+        flyHeight = Math.min(flyHeight+flight, canvas.height-birdSize);
+      }
+      ctx.drawImage(carrotImg, cTenth, flyHeight, birdSize, birdSize);
+
+
+      // points and highScore
+      pointsCount = currentScore * coinCount;
+      if(pointsCount > highScore) highScore = pointsCount;
+
+      // draw stats on canvas
+      ctx.fillStyle = "white";
+      ctx.font = "20px Courier";
+      ctx.fillText(`Candles: ${currentScore}`, 10, 25);
+      ctx.fillText(`Candles Maxi: ${bestScore}`, 10, 50);
+      ctx.fillText(`Coins: ${coinCount}`, 10, 75);
+      ctx.fillText(`Score: ${pointsCount}`, 10, 100);
+      ctx.fillText(`High Score: ${highScore}`, 10, 125);
+
+      // update stats div
+      document.getElementById('currentScore').textContent = `Candles: ${currentScore}`;
+      document.getElementById('bestScore').textContent = `Candles Maxi: ${bestScore}`;
+      document.getElementById('coinCount').textContent = `Coins: ${coinCount}`;
+      document.getElementById('pointsCount').textContent = `Score: ${pointsCount}`;
+      document.getElementById('highScore').textContent = `High Score: ${highScore}`;
+
+      requestAnimationFrame(render);
+    }
+
+    setup();
+    render();
+
+    const jumpHandler = () => {
+      flight = jump;
+      gamePlaying = true;
+    };
+
+    // jump events
+    document.addEventListener('click', jumpHandler);
+    document.addEventListener('touchstart', jumpHandler);
+    window.addEventListener('keydown', e => {
+      if(e.code === 'Space'){
+        e.preventDefault();
+        jumpHandler();
+      }
+    });
+  </script>
+</body>
+</html>

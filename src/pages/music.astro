@@ -1,0 +1,52 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Sidebar from '../components/Sidebar.astro'; 
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+        <BaseHead title="Music" description={SITE_DESCRIPTION} />
+
+	</head>
+	<body>
+		<Header />
+		<div class="content-wrapper">
+			<main>
+				<h1>$APU HIGHER RECORDS</h1>
+				<p>Apu has a very creative community and we are proud to run the $APU HIGHER RECORDS music label as a sub division of Apu Army.</p>
+				<p>Since our founding in April 2024, we’ve created gorillions of Apu songs and released over 100 of them, now available as a collection under the name <strong>Tardest Hits Vol. 1</strong></p>
+
+
+
+
+				<div class="center-wrapper"><img src="/apu-higher-records.jpg" alt="$APU HIGHER RECORDS Logo"></div>
+				
+
+                <p>You can find some of the releases in this <a href ="https://youtube.com/playlist?list=PLeKkMGSWGUvYtH_-twUjP_VcS6YnIZowj&feature=shared" target="_blank" rel="noopener noreferrer">YouTube playlist</a></p>
+				<p>2 community songs were also created, with all the lyrics coming from comments by frens (<a href="https://x.com/shasitomoontaka/status/1817196756053995575" target="_blank" rel="noopener noreferrer">Community Song 1</a> and 
+			
+				<a href="https://x.com/shasitomoontaka/status/1889806355927826884" target="_blank" rel="noopener noreferrer">
+				  Community Song 2</a>)</p>
+
+                <p>If you want to contribute or need a customized song, reach out to <a href="https://x.com/shasitomoontaka" target="_blank" rel="noopener noreferrer">shasito</a></p>
+
+                <div class="center-wrapper"><iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?si=-qwZcjYd-_5jRPxa&amp;list=PLeKkMGSWGUvYtH_-twUjP_VcS6YnIZowj" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+
+				
+                <h2>Apu I really love you</h2>
+                <p>Also make sure to listen to the unofficial hymn of Apu in this <a href="https://open.spotify.com/playlist/37i9dQZF1DZ06evO4nJWeKhttps://en.wikipedia.org/wiki/Meme_coin" target="_blank" rel="noopener noreferrer">Spotify Playlist</a>.</p>
+				<p>Check <a href="https://apu.io" target="_blank" rel="noopener noreferrer">APU FM</a> for more Apu songs.</p>
+
+                
+
+			</main>
+			<Sidebar />
+		</div>
+		<Footer />
+
+	</body>
+</html>

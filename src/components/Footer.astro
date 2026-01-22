@@ -1,0 +1,202 @@
+---
+const today = new Date();
+
+---
+
+<footer class="footer">
+  <!-- Main sections -->
+  <div class="footer-sections">
+    <div class="footer-section">
+      <h4>Support</h4>
+      <a href="/community">Community</a>
+      <a href="https://buymeacoffee.com/shasito" target="_blank" rel="noopener noreferrer">Buy me a choccy milk</a>
+
+      <a href="/helper">Help Helper</a>
+      <a href="https://the-apu-shrimp-collection.nfts2.me/" target="_blank" rel="noopener noreferrer">The Apu Shrimp Collection</a>
+
+    </div>
+
+    <div class="footer-section">
+      <h4>How To</h4>
+      <a href="/apucoin">Buy Apu Coin & NFTs</a>
+      <a href="https://x.com/search?q=%24APU&src=typed_query" target="_blank" rel="noopener noreferrer">
+        Connect with frens
+      </a>
+
+<!-- Trigger text -->
+<a href="#" id="openImage">Get a free Big Mac</a>
+
+<!-- Hidden popup -->
+<div id="imagePopup" style="
+  display:none; 
+  position:fixed; 
+  top:50%; 
+  left:50%; 
+  transform:translate(-50%, -50%); 
+  background:white; 
+  padding:10px; 
+  border-radius:8px; 
+  box-shadow:0 4px 15px rgba(0,0,0,0.3);
+  z-index:1000;
+">
+  <img src="/apu-mac.png" alt="Apu Apustaja Big Mac Meme" style="max-width:400px; max-height:400px;">
+</div>
+
+<!-- Background overlay -->
+<div id="overlay" style="
+  display:none; 
+  position:fixed; 
+  top:0; left:0; 
+  width:100%; height:100%; 
+  background:rgba(0,0,0,0.5); 
+  z-index:999;
+"></div>
+
+<script>
+  const openBtn = document.getElementById('openImage');
+  const popup = document.getElementById('imagePopup');
+  const overlay = document.getElementById('overlay');
+
+  openBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    popup.style.display = 'block';
+    overlay.style.display = 'block';
+  });
+
+  overlay.addEventListener('click', () => {
+    popup.style.display = 'none';
+    overlay.style.display = 'none';
+  });
+
+
+
+</script>
+
+</div>
+    
+
+
+    <div class="footer-section">
+      <h4>Apu Token</h4>
+      <a href="https://apu.io" target="_blank" rel="noopener noreferrer" >Apu.io</a>
+      <a href="https://x.com/apuscoin" target="_blank" rel="noopener noreferrer" >Twitter / X</a>
+      <a href="https://t.me/apuclub" target="_blank" rel="noopener noreferrer" >Telegram</a>
+    </div>
+  </div>
+
+  <div class="footer-row">
+    <div class="footer-item">Made by <a href="https://x.com/shasitomoontaka" target="_blank" rel="noopener noreferrer">shasito</a></div>
+
+	<div class="footer-item">&copy; 2025 All chibben reserved.</div>
+	<div class="footer-item">
+		<img src="/apu-logo.gif" alt="Apu Apustaja $APU Logo GIF" class="footer-gif" />
+
+	</div>
+
+  </div>
+
+  <div class="footer-item" style=" color: grey; font-size: 0.7rem; ">
+    Apu Army and its subdivisions — including $APU HIGHER RECORDS, GreenRock Caputal, and Flat Carrot Productions — are part of GreenRock Caputal LLC Investments & NoBrainer Holdings Inc.<br> We do not provide financial advice.
+  </div>
+  
+  <div><img src="/apu-love.png" alt="Apu Apustaja Love You" class="footer-image" /></div>
+  
+
+</footer>
+
+<style>
+.footer {
+  background: white;
+  padding: 2rem 1rem;
+  font-family: 'Inter', sans-serif;
+  color: rgb(var(--black));
+  position: relative; /* makes the absolute positioning work */
+
+}
+
+.footer-sections {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  margin-left: 3.5rem;
+  margin-right: 3.5rem;
+
+}
+
+.footer-section h4 {
+  margin-bottom: 0.5rem;
+}
+
+.footer-section a {
+  display: block;
+  text-decoration: none;
+  color: rgb(var(--black));
+  margin-bottom: 0.25rem;
+}
+
+.footer-section a:hover {
+  color: var(--accent);
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between; /* spreads the 3 divs */
+  align-items: center;
+  background: white;
+  padding: 1rem 2rem;
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  color: rgb(var(--black));
+  box-shadow: 0 -2px 8px rgba(var(--black), 0.05);
+  margin-top: 3REM;
+}
+
+.footer-row a {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+.footer-row a:hover {
+  text-decoration: underline;
+}
+
+.footer-item {
+  flex: 1;              /* equal width */
+  text-align: center;    /* center text inside each div */
+}
+
+.footer-gif {
+  width: 40px;   /* adjust size */
+  height: auto;  /* keep aspect ratio */
+  display: block;
+  margin: 0 auto; /* center horizontally in the div */
+}
+
+.footer-image {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  height: 150px;
+  width: auto;
+}
+
+
+
+
+@media (max-width: 720px) {
+  .footer-sections {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .footer-row {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+
+}
+</style>

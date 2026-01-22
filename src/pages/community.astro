@@ -1,0 +1,163 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Sidebar from '../components/Sidebar.astro'; 
+import ProfileCard from '../components/ProfileCard.astro';
+
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+        <BaseHead title="Community" description={SITE_DESCRIPTION} />
+
+	</head>
+	<body>
+		<Header />
+		<div class="content-wrapper">
+            <main>
+                <h1>Community</h1>
+                <p>Apu has a lot of frens. Check what they are building in the Apuverse.</p>
+
+				<section class="profiles">
+					
+					<ProfileCard 
+					name="Apu.io" 
+					description="Official Apu Coin & NFT collection" 
+					imgSrc="/apu-logo.png" 
+					imgAlt="Apu Apustaja $APU Logo"
+					links={[
+					  { text: "Apu.io", href: "https://apu.io" },
+					  { text: "X", href: "https://x.com/apuscoin" }
+					]}
+				  />
+
+				  		  
+			  <ProfileCard 
+			  name="Apu Music" 
+			  description="Listen to Apu on your favorite platform." 
+			  links={[
+				{ text: "Spotify", href: "https://open.spotify.com/playlist/37i9dQZF1DZ06evO4nJWeK" },
+				{ text: "Apple Music", href: "https://music.apple.com/us/artist/apu-apustaja/1741104271" }
+			  ]}
+			/>
+
+			<ProfileCard 
+			name="Dune Dashboard" 
+			description="Market insights and analytics for Apu Coin." 
+			links={[
+			  { text: "View Dashboard", href: "https://dune.com/joshua25/apu-apustaja" }
+			]}
+		  />
+
+
+				  <ProfileCard 
+				  name="PondTalk" 
+				  description="Hosting the Apu Podcast" 
+				  links={[
+					{ text: "Twitch", href: "https://twitch.com/pondtalk" },
+					{ text: "YouTube", href: "https://youtube.com/@PondTalk" } ,
+					{ text: "X", href: "https://x.com/blewapu" } ,
+					
+				  ]}
+				/>
+				  
+				<ProfileCard 
+				name="NFT Ranker" 
+				description="Rate your favorite Apu Apustajas. Hot or not?" 
+				links={[
+				  { text: "Website", href: "https://nftranker.io/" }
+				]}
+			  />
+			  
+			  <ProfileCard 
+				name="Poo Strategy" 
+				description="The world's first billion dollar meme reserve." 
+				links={[
+				  { text: "Website", href: "https://poostrategy.com/" }
+				]}
+			  />
+			  
+
+			  
+			  <ProfileCard 
+				name="Ron" 
+				description="Creator of the Apu Apustajas NFT Collection." 
+				links={[
+				  { text: "Linktree", href: "https://linktr.ee/TheRoon" }
+				]}
+			  />
+			  
+			  <ProfileCard 
+				name="Apustajachan" 
+				description="Creator of the Apustaja World video game." 
+				links={[
+				  { text: "Linktree", href: "https://linktr.ee/apustajachan" }
+				]}
+			  />
+			  
+			  <ProfileCard 
+				name="gigAPUmp" 
+				description="Apu 3D video maker." 
+				links={[
+				  { text: "YouTube", href: "https://www.youtube.com/@CasioF91W_DB" }
+				]}
+			  />
+			  
+		
+			  
+			  <ProfileCard 
+				name="Teek" 
+				description="Custom Apu paintings." 
+				links={[
+				  { text: "X", href: "https://x.com/ApteekkiApu" }
+				]}
+			  />
+
+			  <ProfileCard 
+			  name="bluecollarballer" 
+			  description="Apu plushies." 
+			  links={[
+				{ text: "apuplushie.com", href: "https://apuplushie.com" },
+				{ text: "X", href: "https://x.com/lawaia_eth" }
+
+			  ]}
+			/>
+
+			  <ProfileCard 
+			  name="Popcorn Apu" 
+			  description="Apu merchandise shop." 
+			  links={[
+				{ text: "popcornapu.com", href: "https://popcornapu.com" },
+				{ text: "X", href: "https://x.com/PopcornApu" }
+
+			  ]}
+			/>
+			  
+			  <ProfileCard 
+				name="Wen Memes" 
+				description="Apu merchandise shop." 
+				links={[
+				  { text: "wenmemes.shop", href: "https://wenmemes.shop/" }
+				]}
+			  />
+			  
+			  
+
+
+
+					
+					
+				  </section>
+            </main>
+              
+              
+              
+			<Sidebar />
+		</div>
+		<Footer />
+
+	</body>
+</html>

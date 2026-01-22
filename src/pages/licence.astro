@@ -1,0 +1,227 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Sidebar from '../components/Sidebar.astro'; 
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+        <BaseHead title="Shitpost Licence" description={SITE_DESCRIPTION} />
+
+        <style>
+            /* New styles for the License Form */
+.form-container {
+    margin: 20px 0;
+}
+
+.form-container label {
+    display: block;
+    margin: 5px 0;
+}
+
+.form-container input, 
+.form-container textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+
+
+/* New styles for the License Canvas */
+.license-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#license-canvas {
+    border: 1px solid #000;
+}
+
+
+        </style>
+
+	</head>
+	<body>
+		<Header />
+		<div class="content-wrapper">
+			<main>
+				<h1>Shitpost Licence</h1>
+				<p>Make sure to have your licence with you - always.</p>
+
+                <div class="form-container">
+                    <form id="license-form">
+                        <label for="image-upload">Upload Image:</label>
+                        <input type="file" id="image-upload" accept="image/*">
+                        
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" placeholder="Enter Name" required>
+                        
+                        <label for="job-title">Title:</label>
+                        <input type="text" id="job-title" placeholder="Enter Job Title" required>
+                        
+                        <label for="contact">Contact:</label>
+                        <input type="text" id="contact" placeholder="Enter Contact" required>
+                        
+                        <label for="description">Description:</label>
+                        <input type"text" id="description" placeholder="Enter Description" required>
+                        
+                        <div class="center-wrapper">
+                            <button type="submit" class="standard-button" id="generate-btn">Generate License</button>
+                          </div>
+                          
+                    </form>
+
+
+                </div>
+
+    
+                <!-- Canvas for License -->
+                <div class="license-container">
+                    <canvas id="license-canvas" width="600" height="400"></canvas>
+                    <br>
+                    <button class="standard-button" id="download-btn">Download License</button>
+
+                </div>
+
+			</main>
+			<Sidebar />
+		</div>
+		<Footer />
+
+        <script>
+            document.getElementById('license-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+    
+                // Get form values
+                const name = document.getElementById('name').value;
+                const jobTitle = document.getElementById('job-title').value;
+                const contact = document.getElementById('contact').value;
+                const description = document.getElementById('description').value;
+                const imageUpload = document.getElementById('image-upload').files[0];
+    
+                // Get canvas context
+                const canvas = document.getElementById('license-canvas');
+                const ctx = canvas.getContext('2d');
+    
+                // Clear the canvas before drawing
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+                // Draw fixed header
+                ctx.fillStyle = '#558A36'; // Header background color
+                ctx.fillRect(0, 0, canvas.width, 50);  // Header at the top, 50px high
+                ctx.font = 'bold 30px Comic Sans MS, cursive, sans-serif';  // Header font
+                ctx.fillStyle = '#fff';  // White text for header
+                ctx.fillText('Shitpost License', 20, 35);  // Header text
+                
+                // Add image to header on the right
+                const headerImage = new Image();
+                headerImage.onload = function() {
+                    const imageX = canvas.width - 50;  // Position on the right side of the header
+                    const imageY = 5;                  // Position a bit down from the top
+                    const imageWidth = 40;             // Image width
+                    const imageHeight = 40;            // Image height
+                    ctx.drawImage(headerImage, imageX, imageY, imageWidth, imageHeight);
+                };
+                headerImage.src = 'favicon.ico'; // Replace with the actual path to your image
+    
+                // Draw fixed footer
+                ctx.fillStyle = '#558A36'; // Footer background color
+                ctx.fillRect(0, canvas.height - 50, canvas.width, 50); // Footer at the bottom, 50px high
+                ctx.font = 'bold 18px Comic Sans MS, Arial, sans-serif'; // Footer font
+                ctx.fillStyle = '#fff';  // White text for footer
+                ctx.fillText('Issued by ApuArmy', canvas.width - 200, canvas.height - 20);  // Footer text
+    
+                // Draw timestamp (today's date) at the bottom left
+                const date = new Date();
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                const dateString = date.toLocaleDateString('en-GB', options); // Format as "1st Jan 2024"
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px Comic Sans MS, Arial, sans-serif';
+                ctx.fillText(dateString, 20, canvas.height - 20); // Timestamp at bottom left
+    
+                // Background of the license (content area)
+                ctx.fillStyle = '#f4f4f4';
+                ctx.fillRect(0, 50, canvas.width, canvas.height - 100); // Leave space for header and footer
+    
+                // Draw Image if uploaded
+                if (imageUpload) {
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.drawImage(img, 20, 60, 200, 200); // Draw image with specific size
+                    };
+                    img.src = URL.createObjectURL(imageUpload);
+                }
+    
+                // Set the consistent X-coordinate for both labels and input values
+                const labelX = 250;  // Start X-coordinate for the labels and input values
+                const valueX = 350;  // Start X-coordinate for the input values (so they align nicely with labels)
+    
+                // Set the font and color for the text
+                ctx.font = '20px Comic Sans MS, Arial, sans-serif';
+                ctx.fillStyle = '#000';
+    
+                // Draw text for Name, Job Title, Contact, and Description at the same X-position for labels and input values
+                ctx.fillText('Name:', labelX, 80);       // Label for Name
+                ctx.fillText(name, valueX, 80);         // Input value for Name
+    
+                ctx.fillText('Title:', labelX, 130);    // Label for Title
+                ctx.fillText(jobTitle, valueX, 130);   // Input value for Title
+    
+                ctx.fillText('Contact:', labelX, 180);  // Label for Contact
+                ctx.fillText(contact, valueX, 180);    // Input value for Contact
+    
+                ctx.fillText('', 20, 305);  // Label for Description
+                ctx.fillText(description, 20, 305);     // Input value for Description
+                
+                ctx.fillText('The holder is authorized to shitpost', labelX, 255); // Preset text starting at labelX
+    
+    
+                // Draw a border around the license
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            });
+            
+    
+            // Allow user to download the generated ID
+            document.getElementById('download-btn').addEventListener('click', function() {
+                const canvas = document.getElementById('license-canvas');
+                const dataUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = 'license.png';
+                link.click();
+            });
+            
+            // Randomly combine one string from List A and List B, and draw on the canvas
+    const listA = ['Acoustic Fren','Help Helper', 'Blind Truster', 'Chicken Griller',  'Frog Poster', 'Apu Army', 'Friend Forever', 'GOAT','Coffee Lover', 'Shoe Shiller', 'Green Dildo Buyer', 'Mum Lubs Me'];
+    const listB = ['821b565','0daa1b','304f198', '3f7745f', 'a019ee','761d40d',  '6fb133c', 'a54ae8b', 'b74d' , '8a70ef'];
+    
+    document.getElementById('license-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+    
+        // Select random strings from lists
+        const randomA = listA[Math.floor(Math.random() * listA.length)];
+        const randomB = listB[Math.floor(Math.random() * listB.length)];
+        const randomText = `Fren ID: <<< ${randomB} >>> <<< ${randomA} >>> <<< GM/69/APU >>>`;
+    
+    
+        // Draw the random text on the canvas
+        const canvas = document.getElementById('license-canvas');
+        const ctx = canvas.getContext('2d');
+    
+        // Set font and color for random text
+        ctx.font = '18px Comic Sans MS, Arial, sans-serif';
+        ctx.fillStyle = 'rgba(166, 166, 166, 0.5)';
+    
+        // Position the text below the description
+        ctx.fillText(randomText, 20, 340); // Adjust X and Y values as needed
+    });
+    
+        </script>
+	</body>
+</html>

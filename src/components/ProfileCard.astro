@@ -1,0 +1,82 @@
+---
+export interface Props {
+  name: string;
+  description: string;
+  links: { text: string; href: string }[];
+  imgSrc?: string;
+  imgAlt?: string;
+}
+
+const { name, description, links, imgSrc, imgAlt } = Astro.props;
+---
+
+<div class="profile-card">
+  <div class="profile-text">
+    <h3>{name}</h3>
+    <p>{description}</p>
+    <div class="links">
+      {links.map(link => (
+        <a href={link.href} target="_blank" rel="noopener noreferrer">{link.text}</a>
+      ))}
+    </div>
+  </div>
+  {imgSrc && (
+    <img src={imgSrc} alt={imgAlt || name} class="profile-image" />
+  )}
+</div>
+
+<style>
+.profile-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 12px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* <-- changed from center to flex-start */
+}
+
+.profile-image {
+  width: 40px;
+  height: 40px;
+  margin-left: 12px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+
+  .profile-text {
+    flex: 1;
+  }
+
+  .profile-card h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+  }
+
+  .profile-card p {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+  }
+
+  .profile-card .links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .profile-card .links a {
+    color: var(--apu-green, #558A36);
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .profile-card .links a:hover {
+    text-decoration: underline;
+  }
+
+
+</style>

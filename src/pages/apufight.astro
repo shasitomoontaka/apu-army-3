@@ -1,0 +1,92 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
+
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <BaseHead title="ApuFight" description={SITE_DESCRIPTION} />
+    <link rel="stylesheet" href="/apufight/apufight.css" />
+    <style>
+      /* Hide mobile controls by default */
+      #mobile-controls {
+        display: none;
+        background-color: black;
+        padding: 10px;
+        justify-content: center;
+        gap: 10px;
+        position: fixed;
+        bottom: 10px;
+        width: 100%;
+        z-index: 1000;
+      }
+
+      /* Show on small screens */
+      @media (max-width: 768px) {
+        #mobile-controls {
+          display: flex;
+        }
+      }
+
+      #mobile-controls button {
+        font-size: 24px;
+        padding: 10px 20px;
+        color: white;
+        background-color: var(--apu-green);
+        border: none;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <div class="content-wrapper">
+      <main>
+        <h1>ApuFight!</h1>
+        <p>Throw nuggies with space bar! Use the arrow keys or the buttons below on mobile.</p>
+
+        <!-- Game container -->
+        <div id="game-container">
+            <div id="pre-game-image">
+              <img src="/apufight/start-image.jpg" alt="Start Screen" />
+            </div>
+          
+            <div id="player"></div>
+          
+            <!-- HUD -->
+            <div id="hud">
+              <div id="level">Level: 1</div>
+              <div id="timer">Time: 0s</div>
+            </div>
+          
+            <div id="player-health-bar"><div id="player-health-bar-inner"></div></div>
+            <div id="enemy-health-bar"><div id="enemy-health-bar-inner"></div></div>
+          
+            <!-- Start button -->
+            <button id="start-button" class="standard-button">Start</button>
+          </div>
+          
+          <!-- Mobile controls (moved OUTSIDE) -->
+          <div id="mobile-controls">
+            <button id="left-btn">◀</button>
+            <button id="right-btn">▶</button>
+            <button id="jump-btn">▲</button>
+            <button id="shoot-btn">●</button>
+          </div>
+          
+
+
+      </main>
+      <Sidebar />
+    </div>
+    <Footer />
+
+    <!-- Game script -->
+    <script type="module" src="/apufight/apufight.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3); // last 3 posts
+---
+
+<aside class="sidebar">
+  <h3>Recent Posts</h3>
+  <ul>
+    {posts.map((post) => (
+      <li>
+        <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+      </li>
+    ))}
+  </ul>
+  <h4>Games</h4>
+  <ul>
+    <li><a href="/apufight">Apufight</a></li>
+    <li><a href="/mommyrage">Mommy Rage</a></li>
+    <li><a href="/flatty">Flatty Carrot</a></li>
+    <li><a href="/shrimpfarm">Apu's Shrimp Farm</a></li>
+    <li><a href="/frensoccer">Fren Soccer</a></li>
+    <li style="color: red;">[REDACTED]</li>
+  </ul>
+  <h4>NFTs</h4>
+  <ul>
+    <li><a href="https://the-apu-shrimp-collection.nfts2.me/" target="_blank" rel="noopener noreferrer">
+      The Apu Shrimp Collection
+      </a></li>
+  </ul>
+  <h4>Tools</h4>
+  <ul>
+    <li><a href="/licence">Shitpost Licence v1.0</a></li>
+    <li><a href="/crashout">Crashout Appointment</a></li>
+  </ul>
+  
+  
+</aside>
+
+<style>
+.sidebar {
+  background: rgb(var(--gray-light));
+  padding: 1rem;
+  border-radius: 8px;
+  height: fit-content;
+  position: sticky;
+  top: 1rem;
+  margin-top: 0.5rem;
+  line-height: 1.25; /* 1.5 times the font size */
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  color: rgb(var(--black));
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar li {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar a {
+  color: rgb(var(--gray-dark));
+  text-decoration: none;
+}
+
+.sidebar a:hover {
+  color: var(--accent);
+}
+</style>

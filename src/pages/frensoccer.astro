@@ -1,0 +1,416 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { SITE_DESCRIPTION } from '../consts';
+---
+
+<html lang="en">
+<head>
+    <BaseHead title="Fren Soccer" description={SITE_DESCRIPTION} />
+    <style>
+        .fs-game-container { 
+            width:800px; height:450px; 
+            margin:20px auto; 
+            position:relative; 
+            overflow:hidden; 
+            background:url('/frensoccer/stadium.png') center/cover no-repeat; 
+            border-bottom:4px solid #654321; 
+        }
+        .fs-goal { 
+            position:absolute; bottom:0; width:100px; height:120px; 
+            border:4px solid #fff; border-bottom:none; z-index:10; 
+        }
+        .fs-goal.fs-left { left:0; border-right:4px solid #fff; }
+        .fs-goal.fs-right { right:0; border-left:4px solid #fff; }
+        .fs-net { 
+            position:absolute; top:0; width:100%; height:100%; 
+            background-image:repeating-linear-gradient(0deg,transparent,transparent 8px,rgba(255,255,255,0.3) 8px,rgba(255,255,255,0.3) 9px),
+                             repeating-linear-gradient(90deg,transparent,transparent 8px,rgba(255,255,255,0.3) 8px,rgba(255,255,255,0.3) 9px); 
+        }
+        .fs-player { 
+            position:absolute; width:50px; height:80px; 
+            bottom:4px; background-size:cover; background-position:center; 
+            z-index:20; 
+        }
+        .fs-player1 { background-image:url('/frensoccer/soccer.png'); left:80px; }
+        .fs-computer { background-image:url('/frensoccer/5g.png'); right:80px; }
+        .fs-ball { 
+            position:absolute; width:30px; height:30px; 
+            background:url('/frensoccer/ball.png') center/cover no-repeat; 
+            border-radius:50%; bottom:4px; left:50%; transform:translateX(-50%); 
+            transition:all 0.05s ease; 
+            box-shadow:2px 2px 4px rgba(0,0,0,0.3); 
+            z-index:30;
+        }
+        .fs-ui { position:absolute; top:0; width:100%; height:40px; background:rgba(0,0,0,0.5); display:flex; justify-content:space-between; align-items:center; padding:0 10px; color:white; font-weight:bold; z-index:100; }
+        .fs-score { font-size:18px; }
+        .fs-timer { font-size:20px; color:#FFD700; }
+        .fs-power-bar { position:absolute; bottom:60px; left:50%; transform:translateX(-50%); width:200px; height:20px; background:rgba(0,0,0,0.5); border:2px solid #fff; border-radius:10px; display:none; z-index:200; }
+        .fs-power-fill { width:0%; height:100%; background:linear-gradient(90deg,#4CAF50,#FFD700,#FF5722); border-radius:8px; transition:width 0.05s ease; }
+        .fs-power-text { position:absolute; top:-25px; left:50%; transform:translateX(-50%); color:white; font-size:14px; font-weight:bold; text-shadow:1px 1px 2px rgba(0,0,0,0.8); }
+    
+        /* Start overlay */
+        .fs-start-overlay {
+            position:absolute; inset:0; 
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            background:rgba(0,0,0,0.6);
+            z-index:500;
+            color:white;
+            font-size:28px;
+            font-weight:bold;
+        }
+        .fs-start-button {
+            margin-top:20px;
+            padding:10px 20px;
+            font-size:20px;
+            border:none;
+            border-radius:8px;
+            background:#FFD700;
+            cursor:pointer;
+            box-shadow:0 4px 6px rgba(0,0,0,0.3);
+        }
+        .fs-start-button:hover { background:#FFC107; }
+    </style>
+    
+</head>
+<body>
+    <Header />
+    <div class="content-wrapper" style="text-align:center;">
+        <main>
+            <h1>Fren Soccer</h1>
+            <div class="fs-game-container">
+                <div class="fs-goal fs-left"><div class="fs-net"></div></div>
+                <div class="fs-goal fs-right"><div class="fs-net"></div></div>
+
+                <div class="fs-ui">
+                    <div class="fs-score">You: <span id="fs-playerScore">0</span></div>
+                    <div class="fs-timer" id="fs-timer">90</div>
+                    <div class="fs-score" style="margin-right: 2rem;">CPU: <span id="fs-cpuScore">0</span></div>
+                </div>
+
+                <div class="fs-power-bar" id="fs-powerBar">
+                    <div class="fs-power-text">POWER</div>
+                    <div class="fs-power-fill" id="fs-powerFill"></div>
+                </div>
+
+                <div class="fs-player fs-player1" id="fs-player"></div>
+                <div class="fs-player fs-computer" id="fs-computer"></div>
+                <div class="fs-ball" id="fs-ball"></div>
+
+                <!-- Start overlay -->
+                <div class="fs-start-overlay" id="fs-startOverlay">
+                    Fren Soccer
+                    <button class="fs-start-button" id="fs-startButton">Start Game</button>
+                </div>
+            </div>
+        </main>
+        <Sidebar />
+    </div>
+    <Footer />
+
+    <script>
+
+    class FrenSoccer {
+
+
+
+
+        constructor(){
+
+            const AI_LEVELS = {
+        easy:    { difficulty: 0.08, kickChance: 0.3, jumpDistance: 70 },
+        medium:  { difficulty: 0.12, kickChance: 0.55, jumpDistance: 100 },
+        hard:    { difficulty: 0.18, kickChance: 0.85, jumpDistance: 130 }
+        };
+            this.config={
+                physics:{gravity:0.75,friction:0.9},
+                player:{moveSpeed:7,jumpPower:15},
+                shooting:{basePower:11,maxPower:40,chargeRate:0.4},
+                ball:{radius:15,maxSpeed:14,gravityFactor:0.65,groundBounce:-0.95,groundFriction:0.75,airFrictionX:0.999,airFrictionY:0.998},
+                collision:{bounceFactor:1.1,upwardBoost:0.9},
+                ai:{difficulty:2,kickChance:0.35,jumpDistance:75},
+                match:{time:90}
+            };
+            this.config.ai = AI_LEVELS.hard; // pick easy / medium / hard
+
+
+            this.fieldWidth=800;
+            this.fieldHeight=450;
+            this.shotCharging=false;
+            this.shotPower=0;
+            this.playerScore=0;
+            this.cpuScore=0;
+            this.gameTime=this.config.match.time;
+            this.gameActive=false; // start paused
+            this.keys={};
+            this.player={x:80,y:0,vx:0,vy:0,onGround:true,element:document.getElementById('fs-player')};
+            this.computer={x:this.fieldWidth-120,y:0,vx:0,vy:0,onGround:true,element:document.getElementById('fs-computer'),targetX:this.fieldWidth-120};
+            this.ball={x:this.fieldWidth/2,y:-100,vx:0,vy:0,element:document.getElementById('fs-ball')};
+            this.setupControls();
+            this.gameLoop();
+        }
+
+        startGame(){
+            this.playerScore=0; this.cpuScore=0; this.gameTime=this.config.match.time;
+            this.updateScore();
+            this.resetBall();
+            this.gameActive=true;
+            this.startTimer();
+        }
+
+        setupControls(){
+            document.getElementById("fs-startButton").addEventListener("click",()=>{
+                document.getElementById("fs-startOverlay").style.display="none";
+                this.startGame();
+            });
+
+            document.addEventListener('keydown', e => {
+                if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key)) e.preventDefault();
+                this.keys[e.key] = true;
+                if(e.key===' ' && !this.shotCharging) this.startChargingShot();
+            });
+            document.addEventListener('keyup', e => {
+                if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key)) e.preventDefault();
+                this.keys[e.key] = false;
+                if(e.key===' ' && this.shotCharging) this.releaseShot();
+            });
+        }
+
+        handlePlayerInput(){
+            if(!this.gameActive)return;
+            if(this.keys['ArrowLeft']) this.player.vx=-this.config.player.moveSpeed;
+            if(this.keys['ArrowRight']) this.player.vx=this.config.player.moveSpeed;
+            if(this.keys['ArrowUp']){this.jumpPlayer(); this.keys['ArrowUp']=false;}
+        }
+
+        jumpPlayer(){ if(!this.gameActive)return; if(this.player.onGround){this.player.vy=-this.config.player.jumpPower;this.player.onGround=false;} }
+
+        startChargingShot(){
+            if(!this.gameActive)return;
+            this.shotCharging=true;
+            this.shotPower=this.config.shooting.basePower;
+            document.getElementById('fs-powerBar').style.display='block';
+        }
+
+        releaseShot(){
+            if(!this.gameActive||!this.shotCharging)return;
+            this.shootBall(this.shotPower);
+            this.shotCharging=false;
+            this.shotPower=0;
+            document.getElementById('fs-powerBar').style.display='none';
+        }
+
+        updateShotCharge(){
+            if(this.shotCharging&&this.gameActive){
+                this.shotPower=Math.min(this.shotPower+this.config.shooting.chargeRate,this.config.shooting.maxPower);
+                document.getElementById('fs-powerFill').style.width=((this.shotPower-this.config.shooting.basePower)/(this.config.shooting.maxPower-this.config.shooting.basePower)*100)+'%';
+            }
+        }
+
+        shootBall(power){
+            const dx=this.ball.x-this.player.x,dy=this.ball.y-this.player.y,d=Math.sqrt(dx*dx+dy*dy);
+            if(d<90){
+                let angle=Math.atan2(dy,dx);
+                if(this.player.x<this.fieldWidth/2) angle+=(Math.random()-0.5)*0.25;
+                else angle+=(Math.random()-0.5)*0.2;
+                this.ball.vx=Math.cos(angle)*power+this.player.vx*0.4;
+                this.ball.vy=Math.sin(angle)*power-2.5;
+            }
+        }
+
+        updateAI(){
+        if(!this.gameActive) return;
+
+        const cpu = this.computer;
+        const ball = this.ball;
+
+        // --- 1. Predict ball landing X ---
+        let predictedX = ball.x + ball.vx * 12; // look ahead 12 frames
+        predictedX = Math.max(50, Math.min(this.fieldWidth - 150, predictedX));
+
+        // CPU moves toward predicted landing spot
+        cpu.targetX = predictedX;
+
+        const dx = cpu.targetX - cpu.x;
+        if(Math.abs(dx) > 5){
+            cpu.vx = Math.sign(dx) * this.config.player.moveSpeed * this.config.ai.difficulty;
+        } else {
+            cpu.vx = 0; // stay put if close enough
+        }
+
+        // --- 2. Smarter jumping ---
+        const distanceToBall = Math.sqrt((ball.x - cpu.x)**2 + (ball.y - cpu.y)**2);
+        if(distanceToBall < this.config.ai.jumpDistance &&
+        ball.y < cpu.y + 20 && // ball is above or close
+        cpu.onGround){
+            cpu.vy = -this.config.player.jumpPower;
+            cpu.onGround = false;
+        }
+
+        // --- 3. Smarter kicking ---
+        if(distanceToBall < 45 && Math.random() < this.config.ai.kickChance){
+            // Aim toward player's goal (left side)
+            const goalX = 80; 
+            const goalY = 20;
+            const angle = Math.atan2(goalY - ball.y, goalX - ball.x);
+
+            ball.vx += Math.cos(angle) * 9;
+            ball.vy += Math.sin(angle) * 9 - 3; // lift the ball a bit
+        }
+    }
+
+
+        updatePhysics(){
+            this.handlePlayerInput();
+            this.updateAI();
+            this.updateShotCharge();
+
+            [this.player,this.computer].forEach(p=>{
+                p.vy+=this.config.physics.gravity;
+                p.x+=p.vx;
+                p.y+=p.vy;
+                if(p.y>=0){p.y=0;p.vy=0;p.onGround=true;}
+                if(p.x<0)p.x=0;
+                if(p.x>this.fieldWidth-50)p.x=this.fieldWidth-50;
+                p.vx*=this.config.physics.friction;
+            });
+
+            this.ball.vy+=this.config.physics.gravity*this.config.ball.gravityFactor;
+            this.ball.x+=this.ball.vx;
+            this.ball.y+=this.ball.vy;
+
+            // Clamp ball speed
+            const max=this.config.ball.maxSpeed;
+            const speed=Math.sqrt(this.ball.vx**2+this.ball.vy**2);
+            if(speed>max){
+                const scale=max/speed;
+                this.ball.vx*=scale; this.ball.vy*=scale;
+            }
+
+            if(this.ball.y>=0){this.ball.y=0;this.ball.vy*=this.config.ball.groundBounce;this.ball.vx*=this.config.ball.groundFriction;if(Math.abs(this.ball.vy)<2)this.ball.vy=0;}
+            if(this.ball.x<=0){this.ball.x=0;this.ball.vx*=-0.7;}
+            if(this.ball.x>=this.fieldWidth-30){this.ball.x=this.fieldWidth-30;this.ball.vx*=-0.7;}
+            if(this.ball.y<=-this.fieldHeight){this.ball.y=-this.fieldHeight;this.ball.vy*=-0.5;}
+            this.ball.vx*=this.config.ball.airFrictionX;
+            this.ball.vy*=this.config.ball.airFrictionY;
+
+            this.checkBallPlayerCollision(this.player);
+            this.checkBallPlayerCollision(this.computer);
+            this.checkPlayerOpponentCollision();
+            this.checkGoals();
+        }
+
+        checkBallPlayerCollision(player){
+            const ball=this.ball,ballR=this.config.ball.radius;
+            const playerW=50,playerH=80;
+
+            const playerBox={
+                left:player.x,
+                right:player.x+playerW,
+                bottom:player.y,
+                top:player.y+playerH
+            };
+
+            const closestX=Math.max(playerBox.left,Math.min(ball.x+ballR,playerBox.right));
+            const closestY=Math.max(playerBox.bottom,Math.min(ball.y+ballR,playerBox.top));
+
+            const dx=(ball.x+ballR)-closestX;
+            const dy=(ball.y+ballR)-closestY;
+            const distance=Math.sqrt(dx*dx+dy*dy);
+
+            if(distance<ballR){
+                const overlap=ballR-distance;
+                const nx=dx/(distance||1),ny=dy/(distance||1);
+
+                ball.x+=nx*overlap;
+                ball.y+=ny*overlap;
+
+                const rvx=ball.vx-player.vx,rvy=ball.vy-player.vy;
+                const dot=rvx*nx+rvy*ny;
+                if(dot<0){
+                    ball.vx-=(1+this.config.collision.bounceFactor)*dot*nx;
+                    ball.vy-=(1+this.config.collision.bounceFactor)*dot*ny;
+                }
+
+                if(ny>0) ball.vy-=this.config.collision.upwardBoost;
+            }
+        }
+
+        checkPlayerOpponentCollision(){
+            const dx=this.player.x-this.computer.x,dy=this.player.y-this.computer.y;
+            const d=Math.sqrt(dx*dx+dy*dy),minDist=60;
+            if(d<minDist){
+                const nx=dx/(d||1),ny=dy/(d||1),overlap=(minDist-d)/2;
+                this.player.x+=nx*overlap; this.player.y+=ny*overlap;
+                this.computer.x-=nx*overlap; this.computer.y-=ny*overlap;
+                const bounce=0.5;
+                const rvx=this.player.vx-this.computer.vx,rvy=this.player.vy-this.computer.vy;
+                const dot=rvx*nx+rvy*ny;
+                if(dot>0){
+                    this.player.vx-=bounce*dot*nx; this.player.vy-=bounce*dot*ny;
+                    this.computer.vx+=bounce*dot*nx; this.computer.vy+=bounce*dot*ny;
+                }
+            }
+        }
+
+        checkGoals(){
+            if(this.ball.x<=85&&this.ball.x>=0&&this.ball.y<=60&&this.ball.y>=-10){
+                this.cpuScore++; this.updateScore(); this.resetBall();
+            }
+            if(this.ball.x>=this.fieldWidth-105&&this.ball.x<=this.fieldWidth&&this.ball.y<=120&&this.ball.y>=-10){
+                this.playerScore++; this.updateScore(); this.resetBall();
+            }
+        }
+
+        resetBall(){
+            this.ball.x=this.fieldWidth/2; this.ball.y=-100;
+            this.ball.vx=(Math.random()-0.5)*4; this.ball.vy=0;
+        }
+
+        updateScore(){
+            document.getElementById('fs-playerScore').textContent=this.playerScore;
+            document.getElementById('fs-cpuScore').textContent=this.cpuScore;
+        }
+
+        startTimer(){
+            this.timerInterval=setInterval(()=>{
+                if(this.gameActive){
+                    this.gameTime--;
+                    document.getElementById('fs-timer').textContent=this.gameTime;
+                    if(this.gameTime<=0) this.endGame();
+                }
+            },1000);
+        }
+
+        endGame(){
+            this.gameActive=false;
+            clearInterval(this.timerInterval);
+            document.getElementById("fs-startOverlay").style.display="flex";
+            alert((this.playerScore>this.cpuScore?"🎉 You Win!":
+                  this.cpuScore>this.playerScore?"💻 CPU Wins!":"🤝 Draw")
+                  +" Final Score: "+this.playerScore+"-"+this.cpuScore);
+        }
+
+        render(){
+            this.player.element.style.left=this.player.x+'px';
+            this.player.element.style.bottom=(4-this.player.y)+'px';
+            this.computer.element.style.left=this.computer.x+'px';
+            this.computer.element.style.bottom=(4-this.computer.y)+'px';
+            this.ball.element.style.left=this.ball.x+'px';
+            this.ball.element.style.bottom=(4-this.ball.y)+'px';
+        }
+
+        gameLoop(){
+            if(this.gameActive) this.updatePhysics();
+            this.render();
+            requestAnimationFrame(()=>this.gameLoop());
+        }
+    }
+
+    let game;
+    window.addEventListener('load',()=>{game=new FrenSoccer();});
+    </script>
+</body>
+</html>

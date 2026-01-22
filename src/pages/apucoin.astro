@@ -1,0 +1,62 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Sidebar from '../components/Sidebar.astro'; 
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+        <BaseHead title="Apu Coin" description={SITE_DESCRIPTION} />
+
+	</head>
+	<body>
+		<Header />
+		<div class="content-wrapper">
+			<main>
+				<h1>What is Apu Coin?</h1>
+				<p>Apu Coin ($APU) is a <a href="https://en.wikipedia.org/wiki/Meme_coin" target="_blank" rel="noopener noreferrer">memecoin</a> for frens.</p>
+                <p>It has no utility but is used as an internet joke, similar to Dogecoin or Pepe.</p>
+                <p>People also see it as a form of membership in an online community.</p>
+                
+
+				<div class="center-wrapper"><img src="/apu-logo.png" alt="Apu Coin Logo"></div>
+
+				
+                <p>The value of a memecoin is often driven by the strength of its community and the cultural relevance of the meme itself. Legendary examples like Dogecoin and Pepe have already seen extraordinary growth.</p>
+				<p>Dogecoin, for instance, climbed from its all-time low of $0.0000869 on May 6, 2015 to an all-time high of $0.7316 on May 8, 2021 — a staggering gain of more than 273,000% in just six years.</p>
+
+				<div class="center-wrapper">
+					<a
+					  href="https://www.coingecko.com/en/coins/apu-apustaja#markets"
+					  target="_blank"
+					  rel="noopener noreferrer"
+					  class="standard-button"
+					  aria-label="Buy Apu Coin $APU the Apu Apustaja Token"
+					>
+					  Buy Apu Coin
+					</a>
+
+					
+				</div>
+
+				
+
+
+                <h2>What is the Apu Apustaja NFT Collection?</h2>
+                <p>Non-Fungible Tokens (NFTs) are unique digital collectibles, comparable to Pokémon cards.</p>
+                <p>The <a href="https://opensea.io/collection/apuapustajas" target="_blank" rel="noopener noreferrer">Apu Apustaja Collection</a> contains 7,777 unique Apus that can be traded and collected.</p>
+				<div class="center-wrapper"><img src="/apu-nft.gif" alt="Apu Apustaja NFT Collection"/>
+				</div>
+                
+			
+
+			</main>
+			<Sidebar />
+		</div>
+		<Footer />
+
+	</body>
+</html>
